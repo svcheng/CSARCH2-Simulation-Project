@@ -296,7 +296,7 @@ const saveToFile = (text) => {
       class="h-100">
       <v-window-item value="result" class="mb-4 mt-4">
         <v-card 
-          class="h-100 w-auto pa-4 d-flex flex-column justify-end"
+          class="w-auto pa-4 d-flex flex-column justify-end"
           variant="outlined"
         > 
 
@@ -312,7 +312,7 @@ const saveToFile = (text) => {
                 color="var(--vt-c-accent2)"
                 @click.prevent="copyToClipboard(convertedResult)"
                 >
-                <div class="font-weight-bold">Copy</div>
+                <div class="font-weight-bold">Copy to Clipboard</div>
               </v-btn>
 
               <!-- Save Button -->
@@ -325,12 +325,13 @@ const saveToFile = (text) => {
               </v-btn>
 
             </div>
-            
-
           </div>
-          
-
         </v-card>
+        
+
+        <div class="mt-3">
+          asdlkj
+        </div>
       </v-window-item>
     </v-window>
   </v-card>
