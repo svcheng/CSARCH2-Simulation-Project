@@ -1,0 +1,25 @@
+/* global css body properties */
+:root {
+    --vt-c-primary: #04ca9f;
+    --vt-c-secondary: #056d63;
+    --vt-c-accent1: #5c9c96;
+    --vt-c-accent2: #adb4b4;
+    --vt-c-accent3: #3a7e7d;
+    --vt-c-white: #FFFFFF;
+    --vt-c-black: #1E1E1E;
+}
+
+body {
+    
+    min-height: 100vh;
+    color: var(--vt-c-black);
+    background: var(--vt-c-secondary);
+    transition: color 0.5s,
+        background-color 0.5s;
+    line-height: 1.6;
+    font-family: Inter, sans-serif;
+    font-size: 16px;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
