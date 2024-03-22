@@ -9,7 +9,8 @@ const showResults = ref(false);
 const rules = {
   required: (value) => !!value || 'Field is required.',
   isNumber: (value) => !isNaN(value) || 'Field must be a number.',
-  isBinary: (value) => value === '0' || value === '1' || 'Field must be a binary value (0 or 1).'
+  //isBinary: (value) => value === '0' || value === '1' || 'Field must be a binary value (0 or 1).'
+  isBinary: (value) => /^[01]+$/.test(value) || 'Field must be a binary value (0 or 1).'
 }
 
 // Data
@@ -84,8 +85,14 @@ function normalize(num) {
     }
 }
 
-const convertToIEEE = async function (num, exp) {
-    console.log(num, exp)
+const convertToIEEE = async function (num, exp, binary) {
+    if (binary) {
+        for (let i = 0; i < exp; i++) {
+            num += '0'
+        }
+        num = parseInt(num, 2).toString()
+        exp = '0'
+    }
   
     let sb
     let ePrime
@@ -221,7 +228,7 @@ const saveToFile = (text) => {
             <v-btn 
               color="var(--vt-c-accent2)"
             >
-              <div class="font-weight-bold" @click.prevent="convertToIEEE(userData.binary.number, userData.binary.exponent)">Convert</div>
+              <div class="font-weight-bold" @click.prevent="convertToIEEE(userData.binary.number, userData.binary.exponent, true)">Convert</div>
             </v-btn>
           </div>
         </v-card>
@@ -265,7 +272,7 @@ const saveToFile = (text) => {
           <div class="d-flex justify-end">
             <v-btn 
               color="var(--vt-c-accent2)"
-              @click.prevent="convertToIEEE(userData.decimal.number, userData.decimal.exponent)"
+              @click.prevent="convertToIEEE(userData.decimal.number, userData.decimal.exponent, false)"
             >
               <div class="font-weight-bold">Convert</div>
             </v-btn>
