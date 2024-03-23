@@ -6,7 +6,7 @@ This project contains requirements for the partial fulfillment of the group's CS
 The link of this website can be found [here](https://csarch-2-simulation-project-tau.vercel.app/) or use this URL https://csarch-2-simulation-project-tau.vercel.app/
 
 ## Test Cases
-All test cases can be found in this markdown 
+All test cases can be found in this [markdown](docs/test-cases.md) 
 
 ## Analysis Writeup
 The group's write up can be found in this [markdown](docs/write-up.md)
