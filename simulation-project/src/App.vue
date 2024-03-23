@@ -4,6 +4,8 @@ import { ref, reactive } from 'vue'
 const tab = ref('base-2')
 const results_tab = ref('result')
 const showResults = ref(false);
+const snackbar = ref(false);
+const isNan = ref(false);
 
 // Validation rules
 const rules = {
@@ -119,6 +121,14 @@ function binaryToDecimal(binary, exp) {
 }
 
 const convertToIEEE = async function (num, exp, binary) {
+    isNan.value = false;
+    
+    // Check if fields are empty
+    if (!num.trim()) {
+      snackbar.value = true;
+      return;
+    }
+
     if (binary) {
         num = binaryToDecimal(num, exp);
         exp = '0'
@@ -131,6 +141,8 @@ const convertToIEEE = async function (num, exp, binary) {
     sb = num.charAt(0) === '-' ? '1' : '0'
     // Special case: NaN
     if (isNaN(Number(num)) || isNaN(Number(exp))) {
+        isNan.value = true;
+
         sb = '0'
         ePrime = ones(11)
         fractional = '01' + zeroes(50)
@@ -184,6 +196,16 @@ const saveToFile = (convertedResult) => {
 </script>
 
 <template>
+  <v-snackbar close-on-content-click color="var(--vt-c-white)" timer="red" v-model="snackbar" location="top">
+    <div style="color: black;">Please enter a number.</div>
+
+    <template v-slot:actions>
+      <v-btn variant="text" color="red" @click="snackbar = false">
+        <div class="font-weight-bold">Close</div>
+      </v-btn>
+    </template>
+  </v-snackbar>
+
   <div class="text-h3 ma-3 text-white mt-n15 mb-5">
     Binary-64 (IEEE-754 double-precision) Floating Point Simulator
   </div>
@@ -217,7 +239,7 @@ const saveToFile = (convertedResult) => {
             </div>
 
             <!-- Exponent -->
-            <VTextField class="mb-4 w-25" label="Exponent" variant="outlined" :rules="[rules.required, rules.isNumber]"
+            <VTextField class="mb-4 w-25" label="Exponent" variant="outlined"
               v-model="userData.binary.exponent" clearable />
           </div>
 
@@ -251,7 +273,7 @@ const saveToFile = (convertedResult) => {
 
             <!-- Exponent -->
             <VTextField class="mb-4 w-25" label="Exponent" variant="outlined" clearable
-              v-model="userData.decimal.exponent" :rules="[rules.required, rules.isNumber]" />
+              v-model="userData.decimal.exponent" />
           </div>
 
           <!-- Convert Button -->
@@ -276,9 +298,14 @@ const saveToFile = (convertedResult) => {
 
     <v-window v-model="results_tab" class="h-100">
       <v-window-item value="result" class="mb-4 mt-4">
-        <v-card class="w-auto pa-4 d-flex flex-column justify-end" variant="outlined">
 
+        <!-- Result -->
+        <v-card class="w-auto pa-4 d-flex flex-column justify-end" variant="outlined">
           <!-- Binary -->
+
+          <div v-if="isNan" class="text-h6 text-red">
+            NaN
+          </div>
           <div class="d-flex">
             <div class="text-h6">Binary</div>
             <div class="mt-1 ml-4">
@@ -303,11 +330,6 @@ const saveToFile = (convertedResult) => {
           <v-btn color="var(--vt-c-accent2)" @click.prevent="saveToFile(convertedResult)">
             <div class="font-weight-bold">Save to .txt</div>
           </v-btn>
-        </div>
-
-        <div class="mt-3">
-          <!-- TODO: Add steps -->
-
         </div>
       </v-window-item>
     </v-window>
