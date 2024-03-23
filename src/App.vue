@@ -124,7 +124,7 @@ const convertToIEEE = async function (num, exp, binary) {
     isNan.value = false;
     
     // Check if fields are empty
-    if (!num.trim()) {
+    if (!num.trim() | !exp.trim()) {
       snackbar.value = true;
       return;
     }
@@ -197,7 +197,7 @@ const saveToFile = (convertedResult) => {
 
 <template>
   <v-snackbar close-on-content-click color="var(--vt-c-white)" timer="red" v-model="snackbar" location="top">
-    <div style="color: black;">Please enter a number.</div>
+    <div style="color: black;">Please make sure all fields are filled.</div>
 
     <template v-slot:actions>
       <v-btn variant="text" color="red" @click="snackbar = false">
@@ -239,7 +239,7 @@ const saveToFile = (convertedResult) => {
             </div>
 
             <!-- Exponent -->
-            <VTextField class="mb-4 w-25" label="Exponent" variant="outlined"
+            <VTextField class="mb-4 w-25" label="Exponent" variant="outlined" :rules="[rules.required, rules.isNumber]"
               v-model="userData.binary.exponent" clearable />
           </div>
 
@@ -263,7 +263,7 @@ const saveToFile = (convertedResult) => {
 
           <!-- Number -->
           <div class="d-flex justify-space-between">
-            <VTextField class="mb-4 w-50" label="Enter the decimal/base 10 number you would like to convert"
+            <VTextField class="mb-4 w-75" label="Enter the decimal/base 10 number you would like to convert"
               variant="outlined" clearable :rules="[rules.required, rules.isNumber]" v-model="userData.decimal.number"
               hint="Decimal or base 10 numbers are numbers that are represented using 0-9. For example, 1234 is a decimal number." />
 
@@ -273,7 +273,7 @@ const saveToFile = (convertedResult) => {
 
             <!-- Exponent -->
             <VTextField class="mb-4 w-25" label="Exponent" variant="outlined" clearable
-              v-model="userData.decimal.exponent" />
+              :rules="[rules.required, rules.isNumber]" v-model="userData.decimal.exponent" />
           </div>
 
           <!-- Convert Button -->
