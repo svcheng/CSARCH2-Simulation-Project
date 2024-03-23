@@ -9,7 +9,6 @@ const showResults = ref(false);
 const rules = {
   required: (value) => !!value || 'Field is required.',
   isNumber: (value) => !isNaN(value) || 'Field must be a number.',
-  //isBinary: (value) => value === '0' || value === '1' || 'Field must be a binary value (0 or 1).'
   isBinary: (value) => /^[01]+$/.test(value) || 'Field must be a binary value (0 or 1).'
 }
 
@@ -24,12 +23,19 @@ const userData = reactive({
     exponent: '',
   }
 })  
-const convertedResult = ref('')
+
+const convertedResult = ref({
+  sb: '',
+  ePrime: '',
+  fractional: '',
+  hex: ''
+})
+
 
 // Functions
 const toBinary = (str) => Number(str).toString(2)
 const binaryToHex = (str) => {
-    hex = ''
+    let hex = ''
     for (let i=0; i < str.length; i+= 4) {
         // if (i % 16 === 0 && i > 0) {
         //     hex += ' '
@@ -133,24 +139,14 @@ const convertToIEEE = async function (num, exp, binary) {
     
     fractional = fractional.substr(0, 52)
     fractional = fractional + zeroes(Math.max(52 - fractional.length, 0)) // pad to exactly 52 digits
-    convertedResult.value = (sb + ePrime + fractional)
+    convertedResult.value = {sb, ePrime, fractional, hex: binaryToHex(sb + ePrime + fractional)}
     console.log(convertedResult)
     showResults.value = true;
 }
 
-// Copy to clipboard
-const copyToClipboard = (text) => {
-  const el = document.createElement('textarea');
-  el.value = text;
-  document.body.appendChild(el);
-  el.select();
-  document.execCommand('copy');
-  document.body.removeChild(el);
-  console.log('Copied to clipboard')
-}
-
 // Save to file
-const saveToFile = (text) => {
+const saveToFile = (convertedResult) => {
+  const text = `Binary: ${convertedResult.sb} ${convertedResult.ePrime} ${convertedResult.fractional}\nHex: 0x${convertedResult.hex}`;
   const element = document.createElement('a');
   const file = new Blob([text], {type: 'text/plain'});
   element.href = URL.createObjectURL(file);
@@ -160,25 +156,18 @@ const saveToFile = (text) => {
   document.body.removeChild(element);
   console.log('Saved to file');
 }
+
 </script>
 
 <template>
   <div class="text-h3 ma-3 text-white mt-n15 mb-5">
     Binary-64 Floating Point Simulator
   </div>
-  
-  <v-card
-    title=""
-    class="w-75 ma-4 pl-4 pr-4 pb-4"
-    variant="elevated"
-    color="var(--vt-c-white)"
-  >
-    <v-tabs
-      v-model="tab"
-      direction="horizontal"  
-    >
+
+  <v-card title="" class="w-75 ma-4 pl-4 pr-4 pb-4" variant="elevated" color="var(--vt-c-white)">
+    <v-tabs v-model="tab" direction="horizontal">
       <v-tab value="base-2">
-        Binary/Base-2 
+        Binary/Base-2
       </v-tab>
 
       <v-tab value="base-10">
@@ -186,49 +175,33 @@ const saveToFile = (text) => {
       </v-tab>
     </v-tabs>
 
-    <v-window 
-      v-model="tab" 
-      class="h-100">
+    <v-window v-model="tab" class="h-100">
 
       <!-- Base 2 -->
       <v-window-item value="base-2" class="mb-4">
-        <v-card 
-          class="h-100 w-auto mt-4 pa-4 d-flex flex-column justify-end"
-          variant="outlined">
-          
+        <v-card class="h-100 w-auto mt-4 pa-4 d-flex flex-column justify-end" variant="outlined">
+
           <div class="d-flex justify-space-between">
             <!-- Number -->
-            <VTextField
-              class="mb-4 w-75"
-              label="Enter the binary/base 2 number you would like to convert"
-              variant="outlined"
-              clearable
-              :rules="[rules.required, rules.isNumber, rules.isBinary]"
+            <VTextField class="mb-4 w-75" label="Enter the binary/base 2 number you would like to convert"
+              variant="outlined" clearable :rules="[rules.required, rules.isNumber, rules.isBinary]"
               v-model="userData.binary.number"
-              hint="Decimal or base 2 numbers are numbers that are represented using 0-1. For example, 01001 is a decimal number."
-            />
+              hint="Decimal or base 2 numbers are numbers that are represented using 0-1. For example, 01001 is a decimal number." />
 
             <div class="text-h5 mt-3 mr-3 ml-3">
               x2
             </div>
-            
+
             <!-- Exponent -->
-            <VTextField
-              class="mb-4 w-25"
-              label="Exponent"
-              variant="outlined"
-              :rules="[rules.required, rules.isNumber]"
-              v-model="userData.binary.exponent"
-              clearable
-            />
+            <VTextField class="mb-4 w-25" label="Exponent" variant="outlined" :rules="[rules.required, rules.isNumber]"
+              v-model="userData.binary.exponent" clearable />
           </div>
-          
+
           <!-- Convert Button -->
           <div class="d-flex justify-end">
-            <v-btn 
-              color="var(--vt-c-accent2)"
-            >
-              <div class="font-weight-bold" @click.prevent="convertToIEEE(userData.binary.number, userData.binary.exponent, true)">Convert</div>
+            <v-btn color="var(--vt-c-accent2)">
+              <div class="font-weight-bold"
+                @click.prevent="convertToIEEE(userData.binary.number, userData.binary.exponent, true)">Convert</div>
             </v-btn>
           </div>
         </v-card>
@@ -237,43 +210,27 @@ const saveToFile = (text) => {
 
       <!-- Base 10 -->
       <v-window-item value="base-10" class="mb-4">
-        <v-card 
-          class="h-100 w-auto mt-4 pa-4 d-flex flex-column justify-end"
-          variant="outlined">
-          
+        <v-card class="h-100 w-auto mt-4 pa-4 d-flex flex-column justify-end" variant="outlined">
+
           <!-- Number -->
           <div class="d-flex justify-space-between">
-              <VTextField
-              class="mb-4 w-50"
-              label="Enter the decimal/base 10 number you would like to convert"
-              variant="outlined"
-              clearable
-              :rules="[rules.required, rules.isNumber]"
-              v-model="userData.decimal.number"
-              hint="Decimal or base 10 numbers are numbers that are represented using 0-9. For example, 1234 is a decimal number."
-            />
+            <VTextField class="mb-4 w-50" label="Enter the decimal/base 10 number you would like to convert"
+              variant="outlined" clearable :rules="[rules.required, rules.isNumber]" v-model="userData.decimal.number"
+              hint="Decimal or base 10 numbers are numbers that are represented using 0-9. For example, 1234 is a decimal number." />
 
             <div class="text-h5 mt-3 mr-3 ml-3">
               x10
             </div>
-            
+
             <!-- Exponent -->
-            <VTextField
-              class="mb-4 w-25"
-              label="Exponent"
-              variant="outlined"
-              clearable
-              v-model="userData.decimal.exponent"
-              :rules="[rules.required, rules.isNumber]"
-            />
+            <VTextField class="mb-4 w-25" label="Exponent" variant="outlined" clearable
+              v-model="userData.decimal.exponent" :rules="[rules.required, rules.isNumber]" />
           </div>
-          
+
           <!-- Convert Button -->
           <div class="d-flex justify-end">
-            <v-btn 
-              color="var(--vt-c-accent2)"
-              @click.prevent="convertToIEEE(userData.decimal.number, userData.decimal.exponent, false)"
-            >
+            <v-btn color="var(--vt-c-accent2)"
+              @click.prevent="convertToIEEE(userData.decimal.number, userData.decimal.exponent, false)">
               <div class="font-weight-bold">Convert</div>
             </v-btn>
           </div>
@@ -283,61 +240,48 @@ const saveToFile = (text) => {
   </v-card>
 
   <!-- Result -->
-  <v-card
-    title=""
-    class="w-75 ma-4 pl-4 pr-4 pb-4"
-    variant="elevated"
-    color="var(--vt-c-white)"
-  >
-    <v-tabs
-      v-model="results_tab"
-      direction="horizontal"  
-    >
+  <v-card title="" class="w-75 ma-4 pl-4 pr-4 pb-4" variant="elevated" color="var(--vt-c-white)">
+    <v-tabs v-model="results_tab" direction="horizontal">
       <v-tab value="result">
         Result
       </v-tab>
     </v-tabs>
 
-    <v-window 
-      v-model="results_tab" 
-      class="h-100">
+    <v-window v-model="results_tab" class="h-100">
       <v-window-item value="result" class="mb-4 mt-4">
-        <v-card 
-          class="w-auto pa-4 d-flex flex-column justify-end"
-          variant="outlined"
-        > 
+        <v-card class="w-auto pa-4 d-flex flex-column justify-end" variant="outlined">
 
-          <div class="d-flex justify-space-between">
-            <div class="mt-1">{{ convertedResult }}</div>
-            
-            <div>
-              
-              <!-- Copy Button -->
-              <v-btn 
-                class="mr-3"
-                v-if="showResults"
-                color="var(--vt-c-accent2)"
-                @click.prevent="copyToClipboard(convertedResult)"
-                >
-                <div class="font-weight-bold">Copy to Clipboard</div>
-              </v-btn>
-
-              <!-- Save Button -->
-              <v-btn
-                v-if="showResults"
-                color="var(--vt-c-accent2)"
-                @click.prevent="saveToFile(convertedResult)"
-              >
-                <div class="font-weight-bold">Save to .txt</div>
-              </v-btn>
-
+          <!-- Binary -->
+          <div class="d-flex">
+            <div class="text-h6">Binary</div>
+            <div class="mt-1 ml-4">
+              {{ convertedResult.sb }}
+              {{ convertedResult.ePrime }}
+              {{ convertedResult.fractional }}
             </div>
           </div>
+
+          <div class="d-flex">
+            <div class="text-h6">Hex</div>
+            <div class="mt-1 ml-4">
+              0x{{ convertedResult.hex }}
+            </div>
+          </div>
+
+
         </v-card>
-        
+
+        <div class="d-flex justify-end mt-4">
+
+          <!-- Save Button -->
+          <v-btn v-if="showResults" color="var(--vt-c-accent2)" @click.prevent="saveToFile(convertedResult)">
+            <div class="font-weight-bold">Save to .txt</div>
+          </v-btn>
+        </div>
 
         <div class="mt-3">
-          asdlkj
+          <!-- TODO: Add steps -->
+
         </div>
       </v-window-item>
     </v-window>
