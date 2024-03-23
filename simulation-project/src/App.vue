@@ -9,7 +9,7 @@ const showResults = ref(false);
 const rules = {
   required: (value) => !!value || 'Field is required.',
   isNumber: (value) => !isNaN(value) || 'Field must be a number.',
-  isBinary: (value) => /^[-]?[01]+(\.[01]+)?$|^[-]?[0-9]+(\.[0-9]+)?$/.test(value) || 'Field must be a binary or decimal value.'
+  isBinary: (value) => /^[-]?[01]+(\.[01]+)?$/.test(value) || 'Field must be a binary value (0 or 1).'
 }
 
 // Data
@@ -131,10 +131,7 @@ const convertToIEEE = async function (num, exp, binary) {
         } 
         // Normal Case 
         else {
-            if (!rules) {
-              throw new Error('Rules not satisfied');
-            }
-            ePrime = toBinary(normalized.exponent + 1023);
+            ePrime = toBinary(normalized.exponent + 1023)
             ePrime = zeroes(11 - ePrime.length) + ePrime
             fractional = normalized.mantissa
         }
