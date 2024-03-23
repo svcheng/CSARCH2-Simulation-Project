@@ -240,7 +240,7 @@ const saveToFile = (convertedResult) => {
   </v-card>
 
   <!-- Result -->
-  <v-card title="" class="w-75 ma-4 pl-4 pr-4 pb-4" variant="elevated" color="var(--vt-c-white)">
+  <v-card v-if="showResults" title="" class="w-75 ma-4 pl-4 pr-4 pb-4" variant="elevated" color="var(--vt-c-white)">
     <v-tabs v-model="results_tab" direction="horizontal">
       <v-tab value="result">
         Result
@@ -274,7 +274,7 @@ const saveToFile = (convertedResult) => {
         <div class="d-flex justify-end mt-4">
 
           <!-- Save Button -->
-          <v-btn v-if="showResults" color="var(--vt-c-accent2)" @click.prevent="saveToFile(convertedResult)">
+          <v-btn color="var(--vt-c-accent2)" @click.prevent="saveToFile(convertedResult)">
             <div class="font-weight-bold">Save to .txt</div>
           </v-btn>
         </div>
