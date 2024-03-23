@@ -185,7 +185,7 @@ const saveToFile = (convertedResult) => {
 
 <template>
   <div class="text-h3 ma-3 text-white mt-n15 mb-5">
-    Binary-64 Floating Point Simulator
+    Binary-64 (IEEE-754 double-precision) Floating Point Simulator
   </div>
 
   <v-card title="" class="w-75 ma-4 pl-4 pr-4 pb-4" variant="elevated" color="var(--vt-c-white)">
@@ -223,9 +223,12 @@ const saveToFile = (convertedResult) => {
 
           <!-- Convert Button -->
           <div class="d-flex justify-end">
-            <v-btn color="var(--vt-c-accent2)">
-              <div class="font-weight-bold"
-                @click.prevent="convertToIEEE(userData.binary.number, userData.binary.exponent, true)">Convert</div>
+            <v-btn color="var(--vt-c-accent2)"
+              @click.prevent="convertToIEEE(userData.binary.number, userData.binary.exponent, true)">
+
+              <div class="font-weight-bold">
+                Convert
+              </div>
             </v-btn>
           </div>
         </v-card>
@@ -296,7 +299,6 @@ const saveToFile = (convertedResult) => {
         </v-card>
 
         <div class="d-flex justify-end mt-4">
-
           <!-- Save Button -->
           <v-btn color="var(--vt-c-accent2)" @click.prevent="saveToFile(convertedResult)">
             <div class="font-weight-bold">Save to .txt</div>
