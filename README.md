@@ -2,20 +2,12 @@
 
 This project contains requirements for the partial fulfillment of the group's CSARCH2 class. The group was tasked to create a Binary-64 Floating Point Simulator that inputs binary and decimal digits.
 
-## Project Setup
+## Website
 
-```sh
-yarn
-```
 
-### Compile and Hot-Reload for Development
+## Test Cases
+All test cases can be found in this markdown
 
-```sh
-yarn dev
-```
+## Demo
+A short video demo can be found here
 
-### Compile and Minify for Production
-
-```sh
-yarn build
-```
