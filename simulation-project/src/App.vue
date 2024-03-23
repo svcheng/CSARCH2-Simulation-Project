@@ -90,13 +90,37 @@ function normalize(num) {
         'exponent': e
     }
 }
+function binaryToDecimal(binary, exp) {
+    let isNegative = false;
+    let decimalFraction = 0;
+    
+    if (binary[0] === '-') {
+        isNegative = true;
+        binary = binary.slice(1);
+    }
+    const fractionIndex = binary.indexOf('.');
+    let integerPart = binary;
+
+    if (fractionIndex !== -1) {
+        decimalFraction = binary.substring(0, fractionIndex);
+        const binaryFraction = binary.substring(fractionIndex + 1);
+        decimalFraction = parseInt(binaryFraction, 2) / Math.pow(2, binaryFraction.length);
+    }
+
+    const decimalIntegerPart = parseInt(integerPart, 2);
+    let decimalNumber = decimalIntegerPart + decimalFraction;
+    decimalNumber *= Math.pow(2, exp);
+
+    if (isNegative) {
+        decimalNumber = -decimalNumber;
+    }
+
+    return decimalNumber.toString();
+}
 
 const convertToIEEE = async function (num, exp, binary) {
     if (binary) {
-        for (let i = 0; i < exp; i++) {
-            num += '0'
-        }
-        num = parseInt(num, 2).toString()
+        num = binaryToDecimal(num, exp);
         exp = '0'
     }
   
